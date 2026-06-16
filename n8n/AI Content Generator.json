@@ -1,0 +1,156 @@
+{
+  "name": "AI Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        -112
+      ],
+      "id": "9954bed0-f570-4373-a3e9-197c5ad989d2",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional LinkedIn content creator.\n\nCreate a LinkedIn post about Business Automation.\n\nInclude:\n\n1. Attention-grabbing hook\n2. What automation is\n3. Key benefits:\n\n   * Time saving\n   * Error reduction\n   * Increased productivity\n   * Better customer experience\n4. One real-world example\n5. Future of AI and automation\n6. Call to action\n7. 5-8 relevant hashtags\n\nAlso provide:\n\nImage Title:\nImage Description:\nAI Image Prompt:\n\nThe AI Image Prompt should describe a professional LinkedIn banner showing business automation, AI workflows, dashboards, data flow, robotic process automation, digital transformation, productivity growth, modern office environment, professional corporate style, high quality, realistic, suitable for LinkedIn.\n\nReturn output in this format:\n\nDate:\nTopic:\nHook:\nContent:\nImage Title:\nImage Description:\nAI Image Prompt:\nHashtags:\nStatus:\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        272,
+        -112
+      ],
+      "id": "d9c7759a-840e-4f7e-9d1b-304b7018f49b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        272,
+        272
+      ],
+      "id": "faf891bb-adcd-4ce2-95da-664f8ff07aff",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "B66ZGuLvjhBxmx1H",
+          "name": "Groq account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "pallavisharma38883@gmail.com",
+        "subject": "Daily AI Content Idea",
+        "emailType": "text",
+        "message": "=Hello Pallavi,\n\nHere is your AI-generated content for today.\n\n📌 Topic:\n{{$json[\"Topic\"]}}\n\n🎯 Hook:\n{{$json[\"Hook\"]}}\n\n📝 Content:\n{{$json[\"Content\"]}}\n\n🏷️ Hashtags:\n{{$json[\"Hashtags\"]}}\n\nRegards,\nAI Content Generator",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -112
+      ],
+      "id": "f8d13a13-56c2-40a0-8040-f761d66b9dec",
+      "name": "Send a message",
+      "webhookId": "ccdd2c84-eba8-4f9a-ad7c-9d850b60b471",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "o1hOUTpwbZVQRBEC",
+          "name": "Gmail account 12"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.text;\n\n// Extract fields using regex\nconst topic = text.match(/Topic:\\s*(.*)/i)?.[1] || \"\";\nconst hook = text.match(/Hook:\\s*(.*)/i)?.[1] || \"\";\nconst content = text.match(/Content:\\s*([\\s\\S]*?)Hashtags:/i)?.[1]?.trim() || \"\";\nconst hashtags = text.match(/Hashtags:\\s*(.*)/i)?.[1] || \"\";\n\nreturn [{\n  json: {\n    Topic: topic,\n    Hook: hook,\n    Content: content,\n    Hashtags: hashtags\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -112
+      ],
+      "id": "94b1d890-431b-4612-a516-c88118870b56",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba4bedd0-88d7-47ec-a6f0-6a8a4e510db5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e8a2a68c1d8f6fafb3970ede11f88a01effec282b00ea39547c2bfe8a6248117"
+  },
+  "id": "XE3etunpqxRYgSGO",
+  "tags": []
+}
